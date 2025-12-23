@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiCore | Registro de Personal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="auth-wrapper">
+        <div class="auth-form-side">
+            <div class="logo-area">
+                <img src="logo.png" alt="LogiCore Logo" class="logo-img">
+                LogiCore
+            </div>
+
+            <h2>Registro de Personal</h2>
+            <p class="subtitle">Complete su perfil para acceder al portal de flota.</p>
+
+            <form id="onboardingForm" novalidate>
+                <div class="form-group">
+                    <label for="fullName">Nombre</label>
+                    <input type="text" id="fullName" placeholder="Ej. Juan Pérez" autocomplete="off" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="rut">RUT (Con guión)</label>
+                    <input type="text" id="rut" placeholder="Ej. 12.345.678-9" autocomplete="off" maxlength="12"
+                        required>
+                    <div class="validation-message" id="rutError">Formato inválido. Dígito verificador no coincide.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Cargo / Puesto</label>
+                    <select id="role" required>
+                        <option value="" disabled selected>Seleccione Cargo</option>
+                        <option value="Conductor de Flota">Conductor de Flota</option>
+                        <option value="Operario de Bodega">Operario de Bodega</option>
+                        <option value="Coordinador Logístico">Coordinador Logístico</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña de Acceso</label>
+                    <input type="password" id="password" placeholder="Mín 8 caracteres, 1 Símbolo, 1 Mayúscula"
+                        autocomplete="new-password" required>
+                    <div class="strength-meter">
+                        <div class="strength-bar" id="strengthBar"></div>
+                    </div>
+                    <div class="validation-message" id="passError">Contraseña débil. Req: 8+ cars, Mayús, Núm, Símbolo.
+                    </div>
+                </div>
+
+                <input type="hidden" id="lat">
+                <input type="hidden" id="lng">
+                <input type="hidden" id="baseName" value="">
+
+                <button type="submit" class="btn btn-primary">
+                    Registrar y Acceder
+                </button>
+            </form>
+        </div>
+
+        <div class="auth-map-side">
+            <div id="map"></div>
+            <div class="map-overlay-text" id="mapFeedback">
+                📍 Seleccione su <strong>Centro Base</strong> haciendo clic en el mapa.
+            </div>
+        </div>
+    </div>
+
+    <div id="loader" class="hidden">
+        <div class="spinner"></div>
+        <p class="loader-text">Validando Credenciales...</p>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

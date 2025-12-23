@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiCore | Portal de Trabajadores</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body style="background-color: #f4f6f8; overflow: auto; height: auto;">
+
+    <div class="dashboard-wrapper">
+        <nav class="minimal-nav">
+            <div class="logo-area" style="font-size: 1.5rem; margin-bottom: 0;">
+                <img src="logo.png" alt="LogiCore" style="height: 40px; margin-right: 10px;"> LogiCore <span
+                    style="font-size: 0.9rem; color: #888; font-weight: 400; margin-left: 10px;">| PORTAL
+                    CONFIDENCIAL</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="text-align: right;">
+                    <div id="userNameDisplay" style="font-weight: 700; color: var(--secondary);">Usuario</div>
+                    <div id="roleDisplay" style="font-size: 0.8rem; color: var(--text-secondary);">Cargo</div>
+                </div>
+                <button onclick="logout()"
+                    style="padding: 0.5rem 1rem; border: 1px solid var(--error); background: transparent; color: var(--error); border-radius: 4px; cursor: pointer; font-weight: 600;">Salir</button>
+            </div>
+        </nav>
+
+        <main class="container">
+
+            <div class="dashboard-grid">
+                <div class="card" style="border-left: 5px solid var(--primary);">
+                    <span class="stat-label">Entregas Pendientes</span>
+                    <div class="stat-value">12</div>
+                    <span style="color: var(--text-secondary); font-size: 0.8rem;">Actualizado hace 5 min</span>
+                </div>
+                <div class="card" style="border-left: 5px solid var(--success);">
+                    <span class="stat-label">Eficiencia Operativa</span>
+                    <div class="stat-value" style="color: var(--success);">98.5%</div>
+                    <span style="color: var(--text-secondary); font-size: 0.8rem;">Top 5% de la flota</span>
+                </div>
+                <div class="card" style="border-left: 5px solid #3498db;">
+                    <span class="stat-label">Distancia Hoy</span>
+                    <div class="stat-value" style="color: #3498db;">45.2 km</div>
+                    <span style="color: var(--text-secondary); font-size: 0.8rem;">Ruta Optimizada Activa</span>
+                </div>
+            </div>
+
+            <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+
+                <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+                    <div style="padding: 1rem; border-bottom: 1px solid #eee; background: #fff;">
+                        <h3 style="font-size: 1.1rem; color: var(--secondary);">Ruta y Logística en Vivo</h3>
+                    </div>
+                    <div style="flex: 1; height: 400px; position: relative;">
+                        <div id="dashMap" style="width: 100%; height: 100%;"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="font-size: 1.1rem; color: var(--secondary); margin-bottom: 1rem;">Movimientos Semanales
+                    </h3>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="movementChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="card">
+                <h3 style="font-size: 1.1rem; color: var(--secondary); margin-bottom: 1rem;">Manifiesto Activo</h3>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID Paquete</th>
+                                <th>Destino Final</th>
+                                <th>Estado</th>
+                                <th>ETA (Estimado)</th>
+                                <th>Peso</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manifestTable">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        const db = JSON.parse(localStorage.getItem('logistics_db') || '[]');
+        if (db.length === 0) {
+            window.location.href = 'index.html';
+        }
+
+        const currentUser = db[db.length - 1];
+        document.getElementById('userNameDisplay').innerText = currentUser.name;
+        document.getElementById('roleDisplay').innerText = currentUser.role;
+
+        function logout() {
+            if (confirm('¿Cerrar sesión y finalizar turno?')) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        const lat = parseFloat(currentUser.location.lat) || -33.4489;
+        const lng = parseFloat(currentUser.location.lng) || -70.6693;
+
+        const map = L.map('dashMap').setView([lat, lng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        const homeIcon = L.divIcon({
+            className: 'custom-pin',
+            html: '',
+            iconSize: [20, 20]
+        });
+        L.marker([lat, lng], { icon: homeIcon }).addTo(map).bindPopup("Base Asignada").openPopup();
+
+        const randomOffsets = [
+            [0.01, 0.01], [-0.01, -0.01], [0.005, -0.015], [-0.005, 0.015]
+        ];
+
+        randomOffsets.forEach((off, idx) => {
+            const dLat = lat + off[0];
+            const dLng = lng + off[1];
+            L.marker([dLat, dLng]).addTo(map).bindPopup(`Parada #${idx + 1}`);
+        });
+
+        const ctx = document.getElementById('movementChart').getContext('2d');
+        const movementChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+                datasets: [{
+                    label: 'Paquetes Movidos',
+                    data: [45, 59, 80, 81, 56, 40],
+                    backgroundColor: '#ff6b00',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        const manifestData = [
+            { id: 'PKG-9921', dest: 'Av. Providencia 123', status: 'En Ruta', eta: '14:30', w: '2.5kg' },
+            { id: 'PKG-8832', dest: 'Calle Estado 45', status: 'Pendiente', eta: '15:15', w: '1.2kg' },
+            { id: 'PKG-7741', dest: 'Alameda 550', status: 'Entregado', eta: '11:00', w: '5.0kg' },
+            { id: 'PKG-6650', dest: 'Huérfanos 801', status: 'En Ruta', eta: '16:00', w: '0.8kg' }
+        ];
+
+        const tbody = document.getElementById('manifestTable');
+        manifestData.forEach(row => {
+            let badgeClass = 'badge-pending';
+            if (row.status === 'En Ruta') badgeClass = 'badge-active';
+            if (row.status === 'Entregado') badgeClass = 'badge-delivered';
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${row.id}</strong></td>
+                <td>${row.dest}</td>
+                <td><span class="badge ${badgeClass}">${row.status}</span></td>
+                <td>${row.eta}</td>
+                <td>${row.w}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+    </script>
+</body>
+
+</html>
