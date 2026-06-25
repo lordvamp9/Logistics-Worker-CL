@@ -8,20 +8,21 @@
 
 **LogiCore** es una aplicación web moderna diseñada como demostración de un portal logístico. Desarrollada por **vamp9**, simula un entorno seguro donde los trabajadores (conductores, operarios, coordinadores) pueden registrarse, seleccionar su base de operaciones en un mapa interactivo y acceder a un panel de control con métricas en tiempo real.
 
-**Demo:** [Inserta tu link de Netlify aquí]
+**Demo:** 
+[logicore-portal.netlify.app](url)
 
 ---
 
-## 🌟 Características Principales
+##  Características Principales
 
 *   🗺️ **Mapa Interactivo (Leaflet):** Selección visual de los centros de distribución y trazado de rutas de entrega en vivo.
-*   🆔 **Validación Estricta:** Implementación del algoritmo Módulo 11 para la validación automática del RUT chileno.
-*   🔒 **Seguridad de Contraseñas:** Medidor dinámico de fuerza de contraseña en tiempo real.
-*   📊 **Dashboard de Métricas:** Gráficos estadísticos semanales (Chart.js), seguimiento de eficiencia, estado de entregas y un manifiesto logístico detallado.
-*   ⚡ **Single Page Application (SPA):** Navegación fluida y rápida gracias a React Router.
-*   🎨 **Diseño Moderno:** Interfaz limpia, responsiva y orientada a la usabilidad.
+*    **Validación Estricta:** Implementación del algoritmo Módulo 11 para la validación automática del RUT chileno.
+*    **Seguridad de Contraseñas:** Medidor dinámico de fuerza de contraseña en tiempo real.
+*    **Dashboard de Métricas:** Gráficos estadísticos semanales (Chart.js), seguimiento de eficiencia, estado de entregas y un manifiesto logístico detallado.
+*    **Single Page Application (SPA):** Navegación fluida y rápida gracias a React Router.
+*    **Diseño Moderno:** Interfaz limpia, responsiva y orientada a la usabilidad.
 
-## 🛠️ Tecnologías Utilizadas
+##  Tecnologías Utilizadas
 
 *   **Frontend:** React 18, React Router DOM
 *   **Herramientas de Construcción:** Vite
@@ -29,7 +30,7 @@
 *   **Mapas y Gráficos:** React Leaflet, React Chart.js 2
 *   **Alertas:** SweetAlert2
 
-## 🚀 Instalación y Uso Local
+##  Instalación y Uso Local
 
 1.  **Clonar el repositorio:**
     ```bash
@@ -54,7 +55,7 @@
     ```
     Esto creará una carpeta `dist/` lista para ser subida a Netlify, Vercel o tu hosting preferido.
 
-## 📄 Licencia
+##  Licencia
 
 Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
